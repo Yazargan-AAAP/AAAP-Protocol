@@ -1,0 +1,47 @@
+import json
+import hashlib
+from jsonschema import validate, ValidationError
+from datetime import datetime
+
+class AAAPValidator:
+    def __init__(self, log_file, schema_file="aaap-schema.json"):
+        with open(log_file, 'r') as f:
+            self.log_data = json.load(f)
+        with open(schema_file, 'r') as f:
+            self.schema = json.load(f)
+
+    def _compute_hash(self, entry):
+        # Spesifikasyona göre header + body birleşimi
+        block_content = f"{entry['timestamp']}{entry['event_id']}{entry['trigger_type']}{entry['previous_hash']}{json.dumps(entry['data'], sort_keys=True)}"
+        alg = entry.get('hash_algorithm', 'SHA-256')
+        
+        if alg == "SHA-256":
+            return hashlib.sha256(block_content.encode()).hexdigest()
+        elif alg == "SHA3-256":
+            return hashlib.sha3_256(block_content.encode()).hexdigest()
+        raise ValueError(f"Unsupported algorithm: {alg}")
+
+    def validate_all(self):
+        prev_hash = "0" * 64
+        prev_time = "0000-01-01T00:00:00Z"
+        
+        for entry in self.log_data:
+            # 1. Schema Validation (AAAP-003)
+            try:
+                validate(instance=entry, schema=self.schema)
+            except ValidationError:
+                return "AAAP-003: Schema Validation Failed"
+            
+            # 2. Chronology Check (AAAP-002)
+            if entry['timestamp'] <= prev_time:
+                return "AAAP-002: Timestamp Chronology Error"
+            
+            # 3. Hash Value Verification (AAAP-001)
+            calculated_hash = self._compute_hash(entry)
+            if entry['hash_value'] != calculated_hash or entry['previous_hash'] != prev_hash:
+                return "AAAP-001: Invalid Hash Chain"
+            
+            prev_hash = calculated_hash
+            prev_time = entry['timestamp']
+            
+        return "PASS: Chain Integrity Verified"
