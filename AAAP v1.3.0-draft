@@ -1,0 +1,16 @@
+AAAP v1.3.0-draft Güncelleme Özeti:
+​Standart Güncelleme: [RFC 4122] yerine [RFC 9562] (UUID v7/v8) referansına geçildi.
+​Algoritmik Esneklik: hash_algorithm ve hash_value alanları tanımlanarak, gelecekte SHA-3 veya Quantum-resistant algoritmalara geçişin yolu açıldı.
+​Kimlik Doğrulama: signature, key_id ve signature_algorithm alanları eklenerek "Audit Trail"e "Non-repudiation" (inkar edememe) özelliği kazandırıldı.
+​Transport & API: İsteğiniz üzerine API Specification bölümü yeniden eklendi.
+​1.3.0-draft Taslağından İlgili Bölümler:
+​5.1 Field Definitions (Güncellenmiş)
+​hash_algorithm (String, REQUIRED): SHA-256, SHA-3-256 vb. gibi kullanılan hashing algoritması.
+​hash_value (String, REQUIRED): Seçilen algoritma ile hesaplanmış 64-karakterlik hash değeri.
+​signature (String, OPTIONAL): Kaydı üreten imzalayıcının dijital imzası.
+​key_id (String, OPTIONAL): İmzayı doğrulamak için gerekli olan public key tanımlayıcısı.
+​10. Transport & API Specification
+​Platforms implementing AAAP SHOULD expose an /aaap/v1/logs endpoint.
+​Method: GET
+​Parameters: since (ISO 8601), limit (Integer).
+​Response: JSON-Array of audit log nodes.
