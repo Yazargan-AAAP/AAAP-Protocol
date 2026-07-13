@@ -1,0 +1,53 @@
+import json
+import hashlib
+from jsonschema import validate, ValidationError
+from datetime import datetime
+
+class AAAPValidator:
+    def __init__(self, log_file, schema_file="aaap-schema.json"):
+        with open(log_file, 'r') as f:
+            self.log_data = json.load(f)
+        with open(schema_file, 'r') as f:
+            self.schema = json.load(f)
+
+    def _compute_hash(self, entry):
+        # Hash kapsamına hash_algorithm'i de dahil ederek algoritma değişimini imkansız kılıyoruz
+        block_content = (
+            f"{entry['timestamp']}{entry['event_id']}{entry['trigger_type']}"
+            f"{entry['previous_hash']}{entry.get('hash_algorithm', 'SHA-256')}"
+            f"{json.dumps(entry['data'], sort_keys=True)}"
+        )
+        alg = entry.get('hash_algorithm', 'SHA-256')
+        
+        if alg == "SHA-256":
+            return hashlib.sha256(block_content.encode()).hexdigest()
+        elif alg == "SHA3-256":
+            return hashlib.sha3_256(block_content.encode()).hexdigest()
+        raise ValueError(f"Unsupported algorithm: {alg}")
+
+    def validate_all(self):
+        prev_hash = "0" * 64
+        # ISO 8601 zaman karşılaştırması için epoch başlangıcı
+        prev_time = datetime(1, 1, 1, 0, 0, 0)
+        
+        for entry in self.log_data:
+            # 1. Schema Validation (AAAP-003)
+            try:
+                validate(instance=entry, schema=self.schema)
+            except ValidationError:
+                return "AAAP-003: Schema Validation Failed"
+            
+            # 2. Chronology Check (AAAP-002) - Zaman nesnesi üzerinden
+            current_time = datetime.fromisoformat(entry["timestamp"].replace("Z", "+00:00"))
+            if current_time <= prev_time:
+                return "AAAP-002: Timestamp Chronology Error"
+            
+            # 3. Hash Value Verification (AAAP-001)
+            calculated_hash = self._compute_hash(entry)
+            if entry['hash_value'] != calculated_hash or entry['previous_hash'] != prev_hash:
+                return "AAAP-001: Invalid Hash Chain"
+            
+            prev_hash = calculated_hash
+            prev_time = current_time
+            
+        return "PASS: Chain Integrity Verified"
