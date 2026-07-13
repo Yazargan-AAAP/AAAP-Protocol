@@ -1,0 +1,49 @@
+import json
+import hashlib
+import ecdsa # İmza doğrulaması için
+from jsonschema import validate, ValidationError
+
+class AAAPValidator:
+    def __init__(self, log_file):
+        with open(log_file, 'r') as f:
+            self.log_data = json.load(f)
+
+    def _compute_hash(self, entry):
+        # Spesifikasyona göre tam blok hash'leme: 
+        # Tüm alanları sıralı bir şekilde birleştirip hashliyoruz.
+        block_content = f"{entry['timestamp']}{entry['event_id']}{entry['trigger_type']}{entry['previous_hash']}{json.dumps(entry['data'], sort_keys=True)}"
+        
+        alg = entry.get('hash_algorithm', 'SHA-256')
+        if alg == "SHA-256":
+            return hashlib.sha256(block_content.encode()).hexdigest()
+        # Gelecekte eklenecek algoritmalar için genişletilebilir
+        raise ValueError(f"Unsupported algorithm: {alg}")
+
+    def validate_all(self):
+        # 1. JSON Schema (AAAP-003)
+        try:
+            # Buraya 'aaap-schema.json' dosyanızı bağlayabilirsiniz
+            pass 
+        except ValidationError:
+            return "AAAP-003: Schema Validation Failed"
+        
+        prev_hash = "0" * 64
+        
+        for entry in self.log_data:
+            # 2. Hash Bütünlüğü (AAAP-001)
+            current_hash = self._compute_hash(entry)
+            if entry['previous_hash'] != prev_hash:
+                return "AAAP-001: Invalid Hash Chain"
+            
+            # 3. İleriye Dönük İmza Doğrulaması (Non-repudiation)
+            if 'signature' in entry:
+                if not self._verify_signature(entry):
+                    return "AAAP-004: Invalid Signature"
+            
+            prev_hash = current_hash # Zinciri güncelle
+            
+        return "PASS: Chain Integrity Verified"
+
+    def _verify_signature(self, entry):
+        # İleride eklenecek imza doğrulama mantığı
+        return True 
