@@ -1,33 +1,25 @@
-Contributing to the AAAP Protocol
-​Thank you for your interest in contributing to the AAAP (Autonomic, Adaptive, Agile Protocol). As an open-source project, we value transparent and collaborative development.
-​Getting Started
-​Before contributing, please check the existing Issues to see if your topic is already under discussion. If you have a new idea or found a bug, feel free to open a new Issue to start the conversation.
-​Contribution Workflow
-​Fork: Fork this repository to your own GitHub account.
-​Branch: Create a new branch for your changes with a descriptive name.
-​Example: feature/new-enhancement or fix/bug-description.
-​Coding: Implement your changes. Please ensure your code aligns with the existing AAAP architecture and design patterns.
-​Testing: Verify that your changes do not break existing functionality.
-​Pull Request: Submit a Pull Request to the main branch. Please provide a clear summary of your changes in the PR description.
-​Coding Standards
-​Readability: Prioritize clean, modular, and maintainable code over complex "hacks."
-​Documentation: Add comments for non-trivial logic. Keep the project’s internal documentation updated.
-​Protocol Alignment: Ensure every contribution adheres to the core pillars of AAAP: Autonomic, Adaptive, and Agile.
-​Discussions & Support
-​For technical questions or architectural suggestions, please use the GitHub Discussions tab or the relevant Issues thread. We appreciate your efforts to improve the protocol.
-# AAAP Protokolüne Katkıda Bulunma Rehberi
+# Contributing to the AAAP Protocol
 
-AAAP protokolüne gösterdiğiniz ilgi için teşekkür ederiz. Açık kaynaklı bir proje olarak topluluktan gelen katkıları değerli buluyoruz.
+Thank you for your interest in contributing to the AAAP (Autonomic, Adaptive, Agile Protocol). As an open-source project, we value transparent and collaborative development.
 
-## Nasıl Katkıda Bulunabilirsiniz?
-- **Hata Bildirimi:** Lütfen "Issues" sekmesini kullanarak detaylı bir rapor oluşturun.
-- **Özellik Önerileri:** Protokol üzerindeki geliştirmeleriniz için öncelikle bir tartışma başlatın.
-- **Kod Katkıları:** 
-  1. Bu depoyu fork edin.
-  2. Yeni bir branch oluşturun (`git checkout -b ozellik/yeni-katki`).
-  3. Değişikliklerinizi yapın ve test edin.
-  4. Değişikliklerinizi commit edin.
-  5. Bir Pull Request gönderin.
+## Getting Started
 
-## Kod Standartları
-- Yazılan kodların temiz, dökümante edilmiş ve mevcut testleri geçiyor olması beklenir.
+Before contributing, please check the existing **Issues** to see if your topic is already under discussion. If you have a new idea or found a bug, feel free to open a new Issue to start the conversation.
+
+## Contribution Workflow
+
+* **Fork:** Fork this repository to your own GitHub account.
+* **Branch:** Create a new branch for your changes with a descriptive name. Example: `feature/new-enhancement` or `fix/bug-description`.
+* **Coding:** Implement your changes. Please ensure your code aligns with the existing AAAP architecture and design patterns.
+* **Testing:** Verify that your changes do not break existing functionality.
+* **Pull Request:** Submit a Pull Request to the `main` branch. Please provide a clear summary of your changes in the PR description.
+
+## Coding Standards
+
+* **Readability:** Prioritize clean, modular, and maintainable code over complex "hacks."
+* **Documentation:** Add comments for non-trivial logic. Keep the project’s internal documentation updated.
+* **Protocol Alignment:** Ensure every contribution adheres to the core pillars of AAAP: **Autonomic, Adaptive, and Agile**.
+
+## Discussions & Support
+
+For technical questions or architectural suggestions, please use the GitHub **Discussions** tab or the relevant **Issues** thread.
