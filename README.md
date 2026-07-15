@@ -29,3 +29,7 @@ Current implementation is managed under a strict CI/CD pipeline. All commits und
 git clone https://github.com/Yazargan-AAAP/AAAP-Protocol.git
 cd AAAP-Protocol
 python3 validator.py --input sample_data.json
+## Reference Usage Scenarios
+For practical implementation examples, please refer to the [/examples](examples/) directory:
+*   **[protocol_config.json](examples/protocol_config.json):** Template for protocol configuration.
+*   **[usage_example.py](examples/usage_example.py):** A reference script demonstrating how to interface with the validator.
