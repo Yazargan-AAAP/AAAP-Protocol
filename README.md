@@ -26,3 +26,6 @@ Current implementation is managed under a strict CI/CD pipeline. All commits und
 
 ---
 *Maintained by Yazargan-AAAP*
+git clone https://github.com/Yazargan-AAAP/AAAP-Protocol.git
+cd AAAP-Protocol
+python3 validator.py --input sample_data.json
