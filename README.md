@@ -33,3 +33,4 @@ python3 validator.py --input sample_data.json
 For practical implementation examples, please refer to the [/examples](examples/) directory:
 *   **[protocol_config.json](examples/protocol_config.json):** Template for protocol configuration.
 *   **[usage_example.py](examples/usage_example.py):** A reference script demonstrating how to interface with the validator.
+[Read the AAAP v2.0 RFC Specification](SPECIFICATION-v2.0.md)
