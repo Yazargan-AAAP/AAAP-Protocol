@@ -20,6 +20,7 @@ Detailed protocol specifications can be found in:
 *   [Specification Overview](SPECIFICATION.md)
 *   [Specification II](SPECIFICATION%20II.md)
 *   [Specification III](SPECIFICATION%20III.md)
+*   * [AAAP v2.0 RFC Specification](SPECIFICATION-v2.0.md) - Standardized RFC/NIST style technical specification.
 
 ## Development Status
 Current implementation is managed under a strict CI/CD pipeline. All commits undergo automated integrity and security scans to ensure protocol stability.
