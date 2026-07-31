@@ -1,3 +1,5 @@
+python validator.py --audit-log audit-log-2026-07-13.json
+
 # AAAP Protocol (Autonomic, Adaptive, Agile Protocol)
 
 [![AAAP CI Pipeline](https://github.com/Yazargan-AAAP/AAAP-Protocol/actions/workflows/main.yml/badge.svg)](https://github.com/Yazargan-AAAP/AAAP-Protocol/actions/workflows/main.yml)
