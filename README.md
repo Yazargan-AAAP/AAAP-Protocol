@@ -1,4 +1,6 @@
 Algorithmic Accountability and Audit Protocol (AAAP) v2.0
+![AAAP CI Pipeline](https://github.com/Yazargan-AAAP/AAAP-Protocol/actions/workflows/main.yml/badge.svg)
+
 AAAP is an open, dependency-free protocol for documenting, preserving, and verifying observable algorithmic platform behavior.
 Observe → Capture → Timestamp → Classify → Preserve → Notify → Verify
 Quick verification
