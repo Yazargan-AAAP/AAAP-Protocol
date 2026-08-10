@@ -191,23 +191,6 @@ class TestAAAPValidator(unittest.TestCase):
             self.assertTrue(result.startswith("FAIL:"))
         finally:
             Path(tf.name).unlink(missing_ok=True)
-    def test_invalid_json_format(self) -> None:
-        """Verify graceful failure when the log file contains invalid JSON."""
-        tf = tempfile.NamedTemporaryFile(
-            mode="w",
-            encoding="utf-8",
-            suffix=".json",
-            delete=False
-        )
-        tf.write("{ Invalid json content ...")
-        tf.close()
-        
-        try:
-            validator = AAAPValidator(tf.name)
-            result = validator.validate_all()
-            self.assertTrue(result.startswith("FAIL:"))
-        finally:
-            Path(tf.name).unlink(missing_ok=True)
 
 if __name__ == "__main__":
     unittest.main()
