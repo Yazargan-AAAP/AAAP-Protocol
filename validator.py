@@ -85,11 +85,9 @@ class AAAPValidator:
     def _events(self) -> list[dict[str, Any]]:
         """Return the event list from supported AAAP JSON formats."""
 
-        # Allow a raw event list.
         if isinstance(self.document, list):
             return self.document
 
-        # Preferred v2.0 document format.
         if isinstance(self.document, dict):
             events = self.document.get("events")
 
@@ -115,7 +113,6 @@ class AAAPValidator:
                 "top-level JSON value must be an object or array"
             )
 
-        # Validate AAAP v2 document metadata.
         if isinstance(self.document, dict):
 
             for section in (
@@ -168,7 +165,6 @@ class AAAPValidator:
                 "audit log contains no events"
             )
 
-        # Validate every event.
         for index, entry in enumerate(
             events,
             start=1
@@ -260,12 +256,10 @@ class AAAPValidator:
                 start=1
             ):
 
-                # Timestamp validation.
                 timestamp = parse_timestamp(
                     entry["timestamp"]
                 )
 
-                # Chronology validation.
                 if (
                     previous_time is not None
                     and timestamp <= previous_time
@@ -276,7 +270,6 @@ class AAAPValidator:
                         f"{index}"
                     )
 
-                # Duplicate event ID validation.
                 event_id = entry["event_id"]
 
                 if event_id in seen_ids:
@@ -288,7 +281,6 @@ class AAAPValidator:
 
                 seen_ids.add(event_id)
 
-                # Hash-chain validation.
                 if (
                     entry["previous_hash"]
                     != previous_hash
@@ -298,12 +290,10 @@ class AAAPValidator:
                         f"chain at event {index}"
                     )
 
-                # Calculate canonical data hash.
                 calculated_hash = sha256_json(
                     entry["data"]
                 )
 
-                # If data_hash is present, verify it.
                 supplied_hash = entry.get(
                     "data_hash",
                     calculated_hash
@@ -315,8 +305,6 @@ class AAAPValidator:
                         f"mismatch at event {index}"
                     )
 
-                # Next event must point to this
-                # event's data hash.
                 previous_hash = calculated_hash
                 previous_time = timestamp
 
@@ -340,4 +328,41 @@ def main(
 
     parser = argparse.ArgumentParser(
         description=(
-           
+            "Validate an AAAP v2.0 audit log."
+        )
+    )
+
+    parser.add_argument(
+        "--audit-log",
+        "--input",
+        dest="audit_log",
+        required=True,
+        help=(
+            "Path to the AAAP JSON audit log"
+        ),
+    )
+
+    args = parser.parse_args(argv)
+
+    try:
+        result = AAAPValidator(
+            args.audit_log
+        ).validate_all()
+
+    except Exception as exc:
+        print(
+            f"FAIL: {exc}",
+            file=sys.stderr
+        )
+        return 1
+
+    print(result)
+
+    if result.startswith("PASS:"):
+        return 0
+
+    return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
