@@ -1,0 +1,165 @@
+from __future__ import annotations
+
+import json
+import unittest
+from pathlib import Path
+import tempfile
+
+from validator import AAAPValidator, ValidationError, parse_timestamp, sha256_json, ZERO_HASH
+
+
+class TestAAAPValidator(unittest.TestCase):
+    """Unit tests for AAAP v2.0 validator."""
+
+    def setUp(self) -> None:
+        """Create a valid baseline document structure for testing."""
+        self.valid_document = {
+            "protocol": {
+                "name": "Algorithmic Accountability and Audit Protocol (AAAP)",
+                "version": "2.0.0",
+                "license": "Apache-2.0"
+            },
+            "metadata": {
+                "case_reference": "CMA255509",
+                "timestamp": "2026-07-13T06:00:00Z",
+                "auditor": "Test Auditor"
+            },
+            "audit_target": {
+                "platform_scope": ["TestPlatform"],
+                "violation_type": "Test Violation",
+                "status": "UNDER_REVIEW"
+            },
+            "forensic_evidence": {
+                "integrity_check": "SHA-256",
+                "hash_proof": ZERO_HASH,
+                "hash_proof_note": "Test note",
+                "compliance_mandate": "Test mandate"
+            },
+            "events": [
+                {
+                    "timestamp": "2026-07-13T06:00:00Z",
+                    "event_id": "AAAP-TEST-0001",
+                    "trigger_type": "publication",
+                    "previous_hash": ZERO_HASH,
+                    "data": {"message": "hello"},
+                    "data_hash": sha256_json({"message": "hello"})
+                }
+            ]
+        }
+
+    def _write_temp_log(self, data: dict | list) -> str:
+        """Helper to write a temporary JSON log file."""
+        tf = tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            suffix=".json",
+            delete=False
+        )
+        json.dump(data, tf)
+        tf.close()
+        return tf.name
+
+    def test_valid_log(self) -> None:
+        """Verify that a correct log passes validation successfully."""
+        path = self._write_temp_log(self.valid_document)
+        try:
+            validator = AAAPValidator(path)
+            result = validator.validate_all()
+            self.assertTrue(result.startswith("PASS:"))
+        finally:
+            Path(path).unlink(missing_ok=True)
+
+    def test_missing_protocol_section(self) -> None:
+        """Verify failure when a mandatory top-level section is missing."""
+        doc = self.valid_document.copy()
+        del doc["protocol"]
+        path = self._write_temp_log(doc)
+        try:
+            validator = AAAPValidator(path)
+            result = validator.validate_all()
+            self.assertTrue(result.startswith("FAIL:"))
+            self.assertIn("missing top-level section: protocol", result)
+        finally:
+            Path(path).unlink(missing_ok=True)
+
+    def test_invalid_timestamp_format(self) -> None:
+        """Verify failure when timestamp does not end with 'Z'."""
+        doc = self.valid_document.copy()
+        doc["events"][0]["timestamp"] = "2026-07-13T06:00:00+03:00"
+        path = self._write_temp_log(doc)
+        try:
+            validator = AAAPValidator(path)
+            result = validator.validate_all()
+            self.assertTrue(result.startswith("FAIL:"))
+            self.assertIn("timestamp must use UTC 'Z' notation", result)
+        finally:
+            Path(path).unlink(missing_ok=True)
+
+    def test_chronology_error(self) -> None:
+        """Verify AAAP-002: chronological order violation."""
+        doc = self.valid_document.copy()
+        data_2 = {"message": "world"}
+        hash_1 = sha256_json(doc["events"][0]["data"])
+        doc["events"].append({
+            "timestamp": "2026-07-13T05:00:00Z",
+            "event_id": "AAAP-TEST-0002",
+            "trigger_type": "update",
+            "previous_hash": hash_1,
+            "data": data_2,
+            "data_hash": sha256_json(data_2)
+        })
+        path = self._write_temp_log(doc)
+        try:
+            validator = AAAPValidator(path)
+            result = validator.validate_all()
+            self.assertTrue(result.startswith("FAIL:"))
+            self.assertIn("AAAP-002", result)
+        finally:
+            Path(path).unlink(missing_ok=True)
+
+    def test_duplicate_event_id(self) -> None:
+        """Verify AAAP-003: duplicate event ID check."""
+        doc = self.valid_document.copy()
+        data_2 = {"message": "world"}
+        hash_1 = sha256_json(doc["events"][0]["data"])
+        doc["events"].append({
+            "timestamp": "2026-07-13T07:00:00Z",
+            "event_id": "AAAP-TEST-0001",
+            "trigger_type": "update",
+            "previous_hash": hash_1,
+            "data": data_2,
+            "data_hash": sha256_json(data_2)
+        })
+        path = self._write_temp_log(doc)
+        try:
+            validator = AAAPValidator(path)
+            result = validator.validate_all()
+            self.assertTrue(result.startswith("FAIL:"))
+            self.assertIn("AAAP-003", result)
+        finally:
+            Path(path).unlink(missing_ok=True)
+
+    def test_invalid_hash_chain(self) -> None:
+        """Verify AAAP-001: broken hash chain linkage."""
+        doc = self.valid_document.copy()
+        data_2 = {"message": "world"}
+        doc["events"].append({
+            "timestamp": "2026-07-13T07:00:00Z",
+            "event_id": "AAAP-TEST-0002",
+            "trigger_type": "update",
+            "previous_hash": "a" * 64,
+            "data": data_2,
+            "data_hash": sha256_json(data_2)
+        })
+        path = self._write_temp_log(doc)
+        try:
+            validator = AAAPValidator(path)
+            result = validator.validate_all()
+            self.assertTrue(result.startswith("FAIL:"))
+            self.assertIn("AAAP-001", result)
+        finally:
+            Path(path).unlink(missing_ok=True)
+
+
+if __name__ == "__main__":
+    unittest.main()
