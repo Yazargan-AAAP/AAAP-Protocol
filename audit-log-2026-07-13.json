@@ -1,7 +1,7 @@
 {
   "protocol": {
     "name": "Algorithmic Accountability and Audit Protocol (AAAP)",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "license": "Apache-2.0"
   },
   "metadata": {
@@ -10,17 +10,43 @@
     "auditor": "Yazargan Independent Audit Node"
   },
   "audit_target": {
-    "platform_scope": ["Meta", "NASDAQ", "Global Algorithmic Indexers"],
+    "platform_scope": [
+      "Meta",
+      "NASDAQ",
+      "Global Algorithmic Indexers"
+    ],
     "violation_type": "Algorithmic Suppression & Sovereign Creative Exploitation",
     "status": "UNDER_FORENSIC_REVIEW"
   },
   "forensic_evidence": {
     "integrity_check": "SHA-256",
     "hash_proof": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "hash_proof_note": "Retained from the original July 13 record; it is not used as the event-chain hash.",
     "compliance_mandate": "Requires explicit, verified human-in-the-loop creative consent."
   },
   "legal_notice": {
     "framework": "Apache 2.0 Patent & Copyright Protection Clauses",
     "action_required": "Immediate data transparency and algorithmic audit trail disclosure."
-  }
+  },
+  "events": [
+    {
+      "timestamp": "2026-07-13T06:00:00Z",
+      "event_id": "AAAP-2026-07-13-0001",
+      "trigger_type": "publication",
+      "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "data": {
+        "observation": "Audit record published for the stated audit target.",
+        "case_reference": "CMA255509",
+        "platform_scope": [
+          "Meta",
+          "NASDAQ",
+          "Global Algorithmic Indexers"
+        ],
+        "violation_type": "Algorithmic Suppression & Sovereign Creative Exploitation",
+        "status": "UNDER_FORENSIC_REVIEW",
+        "source_record": "audit-log-2026-07-13.json"
+      },
+      "data_hash": "71b256d3badd3e81bed03bef7f35128516143ec18f609633b2632b6320adb15f"
+    }
+  ]
 }
