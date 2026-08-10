@@ -1,0 +1,28 @@
+name: AAAP CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  validate-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Run AAAP Audit-Log Validator
+      run: |
+        python3 validator.py --audit-log audit-log-2026-07-13.json
+
+    - name: Run Unit Tests
+      run: |
+        python3 -m unittest discover -s tests -v
